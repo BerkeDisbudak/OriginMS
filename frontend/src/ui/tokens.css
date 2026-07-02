@@ -1,0 +1,99 @@
+@theme {
+  --bg: #0F0F11;
+  --surface: #18181B;
+  --surface-raised: #1F1F24;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.14);
+  --text-primary: #F4F4F5;
+  --text-secondary: #A1A1AA;
+  --text-tertiary: #71717A;
+
+  --light-bg: #FAFAF9;
+  --light-surface: #FFFFFF;
+  --light-border: #E7E5E4;
+  --light-text-primary: #1C1917;
+  --light-text-secondary: #57534E;
+  --light-text-tertiary: #A8A29E;
+
+  --accent: #6366F1;
+  --accent-subtle: rgba(99,102,241,0.10);
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --info: var(--accent);
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-accent: var(--accent);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  --font-ui: "Inter Variable", Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Geist Mono", monospace;
+  --font-display: "Inter Variable", Inter, system-ui, sans-serif;
+
+  --text-micro: 11px;
+  --text-meta: 12px;
+  --text-dense: 13px;
+  --text-base: 14px;
+  --text-section: 16px;
+  --text-page: 20px;
+  --text-hero-min: 32px;
+  --text-hero-max: 44px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --line-height-body: 1.5;
+  --line-height-heading: 1.2;
+  --tracking-ui: -0.011em;
+  --tracking-label: 0.08em;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --page-gutter: 24px;
+  --section-gap: 24px;
+  --card-gap: 16px;
+  --card-padding: 20px;
+
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-panel: 12px;
+  --radius-pill: 9999px;
+  --shadow-overlay: 0 4px 24px rgba(0,0,0,0.32);
+  --shadow-pop: 0 16px 48px rgba(0,0,0,0.44);
+
+  --icon-inline: 16px;
+  --icon-nav: 20px;
+  --tooltip-delay: 300ms;
+
+  --motion-instant: 0ms;
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-panel: 280ms;
+  --motion-reduced: 80ms;
+  --duration-fast: var(--motion-fast);
+  --duration-base: var(--motion-base);
+  --duration-panel: var(--motion-panel);
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring-soft: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%,
+    0.938 16.7%, 1.017 20.8%, 1.077 26.9%, 1.086 30.9%, 1.038 41.9%,
+    1.001 48.9%, 0.995 55.3%, 1 100%);
+}

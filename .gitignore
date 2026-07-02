@@ -1,0 +1,15 @@
+node_modules/
+.next/
+frontend/.next/
+dist/
+coverage/
+playwright-report/
+storybook-static/
+test-results/
+.turbo/
+.DS_Store
+*.log
+*.tsbuildinfo
+__pycache__/
+.venv/
+*.pyc

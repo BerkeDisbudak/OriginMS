@@ -1,0 +1,40 @@
+[project]
+name = "origin-ms-backend"
+version = "0.0.0"
+requires-python = ">=3.12"
+dependencies = [
+  "alembic>=1.17.0",
+  "asyncpg>=0.31.0",
+  "fastapi>=0.125.0",
+  "httpx>=0.28.0",
+  "pydantic>=2.12.0",
+  "sqlalchemy[asyncio]>=2.0.45",
+  "uvicorn>=0.38.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pyright>=1.1.407",
+  "pytest>=9.0.0",
+  "ruff>=0.14.0"
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pyright]
+include = ["src", "tests", "../scripts/seed.py"]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+venvPath = "."
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
