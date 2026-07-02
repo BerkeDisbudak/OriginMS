@@ -16,6 +16,10 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --project backend
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm biome
