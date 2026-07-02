@@ -16,6 +16,7 @@ export default defineConfig({
     },
     {
       command: "uv run --project backend uvicorn origin_ms.main:app --host 127.0.0.1 --port 8000",
+      env: { ...process.env, PYTHONPATH: "backend/src" },
       url: "http://127.0.0.1:8000/openapi.json",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
