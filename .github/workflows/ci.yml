@@ -22,6 +22,7 @@ jobs:
       - run: pnpm depcruise
       - run: pnpm unit
       - run: pnpm contract-drift
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm playwright
 
   backend:
@@ -34,7 +35,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
-      - run: uv pip install -e ".[dev]"
+      - run: uv sync --extra dev
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pyright
