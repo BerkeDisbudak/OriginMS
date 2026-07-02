@@ -8,6 +8,7 @@
       "!node_modules",
       "!.next",
       "!frontend/.next",
+      "!backend/.venv",
       "!coverage",
       "!playwright-report",
       "!storybook-static",
