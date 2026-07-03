@@ -494,7 +494,7 @@ function ApprovalInboxDetail({
   return (
     <section
       className={cn(
-        "min-w-0 rounded-card border border-border bg-surface p-6",
+        "min-w-0 rounded-card border border-border bg-surface p-6 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
         isPending ? "border-l-2 border-l-accent opacity-60" : "",
       )}
       ref={refTarget}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GlobalPalette } from "./global-palette";
 import "./globals.css";
 import { MotionProvider } from "@/ui/motion/motion-provider";
 import { ToastProvider } from "@/ui/toast";
@@ -17,7 +18,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <MotionProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {children}
+            <GlobalPalette />
+          </ToastProvider>
         </MotionProvider>
       </body>
     </html>
