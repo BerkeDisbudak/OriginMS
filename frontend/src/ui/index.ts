@@ -13,4 +13,5 @@ export {
   TableHeader,
   TableRow,
 } from "./table";
+export { type TabItem, Tabs, type TabsProps } from "./tabs";
 export { type ToastOptions, ToastProvider, useToast } from "./toast";

@@ -20,10 +20,9 @@ import {
   formatRequestAge,
   leaveTypeLabel,
   matchesApprovalSearch,
-  moveSelection,
-  problemDetail,
-  problemFieldMessage,
 } from "@/domain/approval-inbox";
+import { moveSelection } from "@/domain/lib/list-navigation";
+import { problemDetail, problemFieldMessage } from "@/domain/lib/problem";
 import { cn } from "@/lib/cn";
 import {
   Button,

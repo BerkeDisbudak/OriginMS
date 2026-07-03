@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { GlobalPalette } from "./global-palette";
 import "./globals.css";
 import { MotionProvider } from "@/ui/motion/motion-provider";
@@ -17,12 +18,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <MotionProvider>
-          <ToastProvider>
-            {children}
-            <GlobalPalette />
-          </ToastProvider>
-        </MotionProvider>
+        <NuqsAdapter>
+          <MotionProvider>
+            <ToastProvider>
+              {children}
+              <GlobalPalette />
+            </ToastProvider>
+          </MotionProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

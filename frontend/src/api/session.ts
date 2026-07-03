@@ -10,6 +10,25 @@ const demoManagerEmail = "manager@origin-fgl.local";
 const demoPassword = "password";
 export const staleTime = 30_000;
 
+export const demoEmailsByAlias: Record<string, string> = {
+  employee: "employee@origin-fgl.local",
+  executive: "executive@origin-fgl.local",
+  hr: "hr@origin-fgl.local",
+  manager: demoManagerEmail,
+};
+
+export function resolveDemoEmail(alias: string | null, fallbackAlias: string): string {
+  const aliasEmail = alias ? demoEmailsByAlias[alias] : undefined;
+  if (aliasEmail) {
+    return aliasEmail;
+  }
+  const fallbackEmail = demoEmailsByAlias[fallbackAlias];
+  if (!fallbackEmail) {
+    throw new Error(`Unknown demo alias: ${fallbackAlias}`);
+  }
+  return fallbackEmail;
+}
+
 let accessToken: string | undefined;
 
 function configureGeneratedClient() {
@@ -43,15 +62,15 @@ export function ensureGeneratedClientConfigured() {
   configureGeneratedClient();
 }
 
-export function useDemoManagerSession() {
+export function useDemoSession(email: string) {
   const [tokenReady, setTokenReady] = useState(Boolean(accessToken));
 
   const session = useQuery({
-    queryKey: ["approval-inbox", "demo-manager-session"],
+    queryKey: ["demo-session", email],
     queryFn: async () => {
       const { data } = await login({
         body: {
-          email: demoManagerEmail,
+          email,
           password: demoPassword,
         },
         throwOnError: true,
@@ -73,4 +92,8 @@ export function useDemoManagerSession() {
     ...session,
     tokenReady,
   };
+}
+
+export function useDemoManagerSession() {
+  return useDemoSession(demoManagerEmail);
 }
