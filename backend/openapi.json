@@ -8,9 +8,7 @@
   "paths": {
     "/api/v1/auth/login": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Login",
         "operationId": "login",
         "requestBody": {
@@ -59,9 +57,7 @@
     },
     "/api/v1/me": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Get Current User",
         "operationId": "get_current_user",
         "responses": {
@@ -105,9 +101,7 @@
     },
     "/api/v1/employees": {
       "get": {
-        "tags": [
-          "employees"
-        ],
+        "tags": ["employees"],
         "summary": "List Employees",
         "operationId": "list_employees",
         "security": [
@@ -205,9 +199,7 @@
     },
     "/api/v1/employees/{employee_id}": {
       "get": {
-        "tags": [
-          "employees"
-        ],
+        "tags": ["employees"],
         "summary": "Get Employee",
         "operationId": "get_employee",
         "security": [
@@ -280,9 +272,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "employees"
-        ],
+        "tags": ["employees"],
         "summary": "Update Employee",
         "operationId": "update_employee",
         "security": [
@@ -367,9 +357,7 @@
     },
     "/api/v1/employees/{employee_id}/leave-history": {
       "get": {
-        "tags": [
-          "employees"
-        ],
+        "tags": ["employees"],
         "summary": "List Employee Leave History",
         "operationId": "list_employee_leave_history",
         "security": [
@@ -494,9 +482,7 @@
     },
     "/api/v1/employees/{employee_id}/leave-balance": {
       "get": {
-        "tags": [
-          "employees"
-        ],
+        "tags": ["employees"],
         "summary": "Get Leave Balance",
         "operationId": "get_leave_balance",
         "security": [
@@ -571,9 +557,7 @@
     },
     "/api/v1/leave-requests": {
       "post": {
-        "tags": [
-          "leave_requests"
-        ],
+        "tags": ["leave_requests"],
         "summary": "Create Leave Request",
         "operationId": "create_leave_request",
         "security": [
@@ -655,9 +639,7 @@
         }
       },
       "get": {
-        "tags": [
-          "leave_requests"
-        ],
+        "tags": ["leave_requests"],
         "summary": "List Leave Requests",
         "operationId": "list_leave_requests",
         "security": [
@@ -783,9 +765,7 @@
     },
     "/api/v1/leave-requests/{leave_request_id}": {
       "get": {
-        "tags": [
-          "leave_requests"
-        ],
+        "tags": ["leave_requests"],
         "summary": "Get Leave Request",
         "operationId": "get_leave_request",
         "security": [
@@ -870,9 +850,7 @@
     },
     "/api/v1/leave-requests/{leave_request_id}/approve": {
       "post": {
-        "tags": [
-          "leave_requests"
-        ],
+        "tags": ["leave_requests"],
         "summary": "Approve Leave Request",
         "operationId": "approve_leave_request",
         "security": [
@@ -957,9 +935,7 @@
     },
     "/api/v1/leave-requests/{leave_request_id}/reject": {
       "post": {
-        "tags": [
-          "leave_requests"
-        ],
+        "tags": ["leave_requests"],
         "summary": "Reject Leave Request",
         "operationId": "reject_leave_request",
         "security": [
@@ -1054,9 +1030,7 @@
     },
     "/api/v1/leave-requests/{leave_request_id}/cancel": {
       "post": {
-        "tags": [
-          "leave_requests"
-        ],
+        "tags": ["leave_requests"],
         "summary": "Cancel Leave Request",
         "operationId": "cancel_leave_request",
         "security": [
@@ -1172,11 +1146,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "email",
-          "role"
-        ],
+        "required": ["id", "email", "role"],
         "title": "CurrentUserResponse"
       },
       "EmployeePage": {
@@ -1195,10 +1165,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "page"
-        ],
+        "required": ["items", "page"],
         "title": "EmployeePage"
       },
       "EmployeeResponse": {
@@ -1302,11 +1269,7 @@
       },
       "EmployeeStatus": {
         "type": "string",
-        "enum": [
-          "active",
-          "on_leave",
-          "terminated"
-        ],
+        "enum": ["active", "on_leave", "terminated"],
         "title": "EmployeeStatus"
       },
       "EmployeeUpdate": {
@@ -1462,11 +1425,7 @@
       },
       "EmploymentType": {
         "type": "string",
-        "enum": [
-          "full_time",
-          "part_time",
-          "contractor"
-        ],
+        "enum": ["full_time", "part_time", "contractor"],
         "title": "EmploymentType"
       },
       "LeaveBalanceResponse": {
@@ -1557,12 +1516,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "employee_id",
-          "type",
-          "start_date",
-          "end_date"
-        ],
+        "required": ["employee_id", "type", "start_date", "end_date"],
         "title": "LeaveRequestCreate"
       },
       "LeaveRequestPage": {
@@ -1581,10 +1535,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "page"
-        ],
+        "required": ["items", "page"],
         "title": "LeaveRequestPage"
       },
       "LeaveRequestResponse": {
@@ -1708,24 +1659,12 @@
       },
       "LeaveStatus": {
         "type": "string",
-        "enum": [
-          "pending",
-          "approved",
-          "rejected",
-          "cancelled"
-        ],
+        "enum": ["pending", "approved", "rejected", "cancelled"],
         "title": "LeaveStatus"
       },
       "LeaveType": {
         "type": "string",
-        "enum": [
-          "ANNUAL",
-          "SICK",
-          "UNPAID",
-          "EXCUSE",
-          "MARRIAGE",
-          "BEREAVEMENT"
-        ],
+        "enum": ["ANNUAL", "SICK", "UNPAID", "EXCUSE", "MARRIAGE", "BEREAVEMENT"],
         "title": "LeaveType"
       },
       "LoginRequest": {
@@ -1743,10 +1682,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "title": "LoginRequest"
       },
       "LoginResponse": {
@@ -1764,9 +1700,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "access_token"
-        ],
+        "required": ["access_token"],
         "title": "LoginResponse"
       },
       "PageInfo": {
@@ -1820,11 +1754,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "title",
-          "status",
-          "detail"
-        ],
+        "required": ["title", "status", "detail"],
         "title": "ProblemDetail"
       },
       "ProblemFieldError": {
@@ -1846,11 +1776,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "field",
-          "code",
-          "message"
-        ],
+        "required": ["field", "code", "message"],
         "title": "ProblemFieldError"
       },
       "RejectLeaveRequestBody": {
@@ -1863,20 +1789,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "reason"
-        ],
+        "required": ["reason"],
         "title": "RejectLeaveRequestBody"
       },
       "Role": {
         "type": "string",
-        "enum": [
-          "employee",
-          "manager",
-          "hr_admin",
-          "executive",
-          "admin"
-        ],
+        "enum": ["employee", "manager", "hr_admin", "executive", "admin"],
         "title": "Role"
       }
     },
