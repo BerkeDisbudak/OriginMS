@@ -10,17 +10,20 @@ import type { EmployeeResponse } from "@/api/generated/types.gen";
 import { approvalStatusLabel, approvalStatusTone, leaveTypeLabel } from "@/domain/approval-inbox";
 import { problemDetail, problemFieldMessage } from "@/domain/lib/problem";
 import { Button, Input, StatusPill, useToast } from "@/ui";
+import { MorphRevealGroup, MorphRevealItem } from "@/ui/motion/shared-element";
 
 export function OverviewTab({
   canEdit,
   editOpen,
   employee,
   onEditOpenChange,
+  revealContent,
 }: {
   canEdit: boolean;
   editOpen: boolean;
   employee: EmployeeResponse;
   onEditOpenChange: (open: boolean) => void;
+  revealContent: boolean;
 }) {
   const balance = useEmployeeLeaveBalance(employee.id, true);
   const history = useEmployeeLeaveHistory(employee.id, true);
@@ -82,41 +85,45 @@ export function OverviewTab({
         </div>
       ) : null}
 
-      <div className="rounded-card border border-border p-4">
-        <p className="text-meta font-medium tracking-label text-text-tertiary uppercase">
-          Leave balance
-        </p>
-        <p className="mt-2 text-base text-text-primary">
-          {balance.data ? `${balance.data.remaining} days remaining` : "Loading..."}
-        </p>
-      </div>
+      <MorphRevealGroup reveal={revealContent}>
+        <div className="grid gap-5">
+          <MorphRevealItem className="rounded-card border border-border p-4">
+            <p className="text-meta font-medium tracking-label text-text-tertiary uppercase">
+              Leave balance
+            </p>
+            <p className="mt-2 text-base text-text-primary">
+              {balance.data ? `${balance.data.remaining} days remaining` : "Loading..."}
+            </p>
+          </MorphRevealItem>
 
-      <div>
-        <div className="flex items-center justify-between">
-          <p className="text-meta font-medium tracking-label text-text-tertiary uppercase">
-            Recent leave history
-          </p>
-          <Button size="sm" variant="ghost">
-            View all &rarr;
-          </Button>
+          <MorphRevealItem>
+            <div className="flex items-center justify-between">
+              <p className="text-meta font-medium tracking-label text-text-tertiary uppercase">
+                Recent leave history
+              </p>
+              <Button size="sm" variant="ghost">
+                View all &rarr;
+              </Button>
+            </div>
+            <ul className="mt-2 grid gap-2">
+              {history.data?.items.length ? (
+                history.data.items.map((item) => (
+                  <li className="flex items-center justify-between text-base" key={item.id}>
+                    <span>{leaveTypeLabel(item.type)}</span>
+                    <StatusPill
+                      compact
+                      label={approvalStatusLabel(item.status)}
+                      tone={approvalStatusTone(item.status)}
+                    />
+                  </li>
+                ))
+              ) : (
+                <li className="text-base text-text-secondary">No leave history yet.</li>
+              )}
+            </ul>
+          </MorphRevealItem>
         </div>
-        <ul className="mt-2 grid gap-2">
-          {history.data?.items.length ? (
-            history.data.items.map((item) => (
-              <li className="flex items-center justify-between text-base" key={item.id}>
-                <span>{leaveTypeLabel(item.type)}</span>
-                <StatusPill
-                  compact
-                  label={approvalStatusLabel(item.status)}
-                  tone={approvalStatusTone(item.status)}
-                />
-              </li>
-            ))
-          ) : (
-            <li className="text-base text-text-secondary">No leave history yet.</li>
-          )}
-        </ul>
-      </div>
+      </MorphRevealGroup>
     </div>
   );
 }

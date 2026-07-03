@@ -10,6 +10,7 @@ export type PanelProps = {
   actions?: ReactNode;
   children: ReactNode;
   className?: string;
+  disableEntrySlide?: boolean;
   footer?: ReactNode;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -21,6 +22,7 @@ export function Panel({
   actions,
   children,
   className,
+  disableEntrySlide,
   footer,
   onOpenChange,
   open,
@@ -47,6 +49,7 @@ export function Panel({
           "absolute right-0 top-0 flex h-dvh w-full max-w-[420px] flex-col border-l border-border bg-surface shadow-overlay",
           className,
         )}
+        disableEntrySlide={disableEntrySlide}
         open={open}
         role="dialog"
       >

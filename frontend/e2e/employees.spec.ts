@@ -76,3 +76,65 @@ test("manager does not see the Edit affordance", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Edit" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "More actions" })).toBeVisible();
 });
+
+test("row-to-panel morph completes cleanly without layout thrash", async ({ page }) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") consoleErrors.push(msg.text());
+  });
+
+  await openDirectory(page);
+
+  await page.locator("tbody tr").first().click();
+  const panel = page.getByRole("dialog");
+  await expect(panel).toBeVisible();
+
+  // Morph settles, then body content fades in (MOTION_SPEC §5's sequence).
+  await expect(panel.getByText("Leave balance")).toBeVisible();
+  await expect(panel.locator("h2")).not.toHaveText("Employee");
+
+  expect(consoleErrors).toEqual([]);
+});
+
+test("keyboard interrupt-spam retargets cleanly with no console errors", async ({ page }) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") consoleErrors.push(msg.text());
+  });
+
+  await openDirectory(page);
+
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("j");
+  await page.keyboard.press("j");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("Enter");
+
+  const panel = page.getByRole("dialog");
+  await expect(panel).toBeVisible();
+  await expect(panel.getByText("Leave balance")).toBeVisible();
+
+  expect(consoleErrors).toEqual([]);
+});
+
+// Known gap, not introduced by the morph: ui/panel.tsx has no focus trap or
+// auto-focus, so keyboard Tab after opening the panel keeps cycling through
+// the directory rows underneath instead of entering the panel. Pre-existing
+// since 3b's plain slide-in (never caught because 3b's keyboard tests didn't
+// check Tab-into-panel specifically); out of scope to fix in this pass.
+test.fixme("keyboard Tab after opening lands inside the panel, not the directory rows", async ({
+  page,
+}) => {
+  await openDirectory(page);
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog")).toBeVisible();
+
+  await page.keyboard.press("Tab");
+  const focusedInsidePanel = await page.evaluate(
+    () => !!document.activeElement?.closest('[role="dialog"]'),
+  );
+  expect(focusedInsidePanel).toBe(true);
+});

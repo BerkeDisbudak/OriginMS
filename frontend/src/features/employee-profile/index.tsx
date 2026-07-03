@@ -3,13 +3,10 @@
 import { DotsThree } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useEmployeeProfile, useEmployeesCurrentUser } from "@/api/employees";
-import {
-  employeeFullName,
-  employeeInitials,
-  employeeStatusLabel,
-  employeeStatusTone,
-} from "@/domain/employees";
+import { employeeFullName, employeeStatusLabel, employeeStatusTone } from "@/domain/employees";
 import { Button, Panel, StatusPill, Tabs } from "@/ui";
+import { SharedElement, SharedElementText } from "@/ui/motion/shared-element";
+import { EmployeeAvatar } from "./avatar";
 import { OverviewTab } from "./overview-tab";
 
 type TabId = "overview" | "employment" | "time" | "documents";
@@ -31,10 +28,12 @@ export function EmployeeProfilePanel({
   const open = employeeId !== null;
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [editOpen, setEditOpen] = useState(false);
+  const [morphSettled, setMorphSettled] = useState(false);
 
   useEffect(() => {
     setActiveTab("overview");
     setEditOpen(false);
+    setMorphSettled(false);
   }, [employeeId]);
 
   useEffect(() => {
@@ -54,6 +53,7 @@ export function EmployeeProfilePanel({
 
   return (
     <Panel
+      disableEntrySlide
       onOpenChange={(next) => {
         if (!next) {
           onClose();
@@ -64,30 +64,35 @@ export function EmployeeProfilePanel({
     >
       {employee ? (
         <>
-          <div className="flex items-center gap-3 border-b border-border pb-5">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-pill bg-accent-subtle text-base font-semibold text-accent">
-              {employeeInitials(employee)}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-section font-semibold text-text-primary">
-                {employeeFullName(employee)}
-              </p>
-              <p className="truncate text-meta text-text-secondary">
-                {employee.title} &middot; {employee.department_id}
-              </p>
-            </div>
-            <StatusPill
-              label={employeeStatusLabel(employee.status)}
-              tone={employeeStatusTone(employee.status)}
-            />
-            {canEdit ? (
-              <Button onClick={() => setEditOpen(true)} size="sm" variant="secondary">
-                Edit
+          <div className="border-b border-border pb-5">
+            <div className="flex items-center gap-3">
+              <SharedElement
+                className="flex items-center gap-3"
+                layoutId={`emp-${employee.id}`}
+                onMorphComplete={() => setMorphSettled(true)}
+              >
+                <EmployeeAvatar employee={employee} size={40} />
+                <SharedElementText className="truncate text-[16px] font-semibold text-text-primary">
+                  {employeeFullName(employee)}
+                </SharedElementText>
+              </SharedElement>
+              <div className="min-w-0 flex-1" />
+              <StatusPill
+                label={employeeStatusLabel(employee.status)}
+                tone={employeeStatusTone(employee.status)}
+              />
+              {canEdit ? (
+                <Button onClick={() => setEditOpen(true)} size="sm" variant="secondary">
+                  Edit
+                </Button>
+              ) : null}
+              <Button aria-label="More actions" size="sm" variant="ghost">
+                <DotsThree aria-hidden="true" size={16} />
               </Button>
-            ) : null}
-            <Button aria-label="More actions" size="sm" variant="ghost">
-              <DotsThree aria-hidden="true" size={16} />
-            </Button>
+            </div>
+            <p className="mt-2 truncate pl-[52px] text-meta text-text-secondary">
+              {employee.title} &middot; {employee.department_id}
+            </p>
           </div>
           <div className="pt-5">
             <Tabs
@@ -101,6 +106,7 @@ export function EmployeeProfilePanel({
                   editOpen={editOpen}
                   employee={employee}
                   onEditOpenChange={setEditOpen}
+                  revealContent={morphSettled}
                 />
               ) : (
                 <PlaceholderTab

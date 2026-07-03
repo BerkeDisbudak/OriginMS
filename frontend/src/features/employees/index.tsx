@@ -7,6 +7,7 @@ import type { EmployeePage, EmployeeResponse } from "@/api/generated/types.gen";
 import { employeeFullName, employeeStatusLabel, employeeStatusTone } from "@/domain/employees";
 import { moveSelection } from "@/domain/lib/list-navigation";
 import { EmployeeProfilePanel } from "@/features/employee-profile";
+import { EmployeeAvatar } from "@/features/employee-profile/avatar";
 import { cn } from "@/lib/cn";
 import {
   Button,
@@ -19,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/ui";
+import { AnimatePresence, SharedElement, SharedElementText } from "@/ui/motion/shared-element";
 
 export function EmployeesDirectoryPage() {
   return (
@@ -119,68 +121,70 @@ function EmployeesDirectoryShell() {
   const hasNextPage = Boolean(pages.at(-1)?.page.next_cursor);
 
   return (
-    <main className="min-h-screen bg-bg p-6 text-text-primary">
-      <section className="mx-auto grid max-w-[900px] gap-6">
-        <div>
-          <p className="text-meta font-medium tracking-label text-text-tertiary uppercase">
-            Directory
-          </p>
-          <h1 className="mt-1 text-page font-semibold leading-heading">Employees</h1>
-        </div>
-        <div className="rounded-card border border-border bg-surface">
-          {isLoading ? (
-            <p className="p-5 text-base text-text-secondary">Loading...</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allEmployees.length ? (
-                  allEmployees.map((employee, index) => (
-                    <EmployeeRow
-                      active={index === activeIndex}
-                      employee={employee}
-                      key={employee.id}
-                      onSelect={() => {
-                        setActiveIndex(index);
-                        void setPanelEmployeeId(employee.id);
-                      }}
-                    />
-                  ))
-                ) : (
-                  <tr>
-                    <TableEmpty colSpan={3}>No employees found</TableEmpty>
-                  </tr>
-                )}
-              </TableBody>
-            </Table>
-          )}
-          <div className="border-t border-border p-4">
-            <Button
-              disabled={!hasNextPage || employees.isFetching}
-              onClick={() => {
-                const nextCursor = pages.at(-1)?.page.next_cursor;
-                if (nextCursor) {
-                  setCursor(nextCursor);
-                }
-              }}
-              size="sm"
-            >
-              {employees.isFetching && cursor ? "Loading..." : "Load more"}
-            </Button>
+    <AnimatePresence mode="popLayout">
+      <main className="min-h-screen bg-bg p-6 text-text-primary">
+        <section className="mx-auto grid max-w-[900px] gap-6">
+          <div>
+            <p className="text-meta font-medium tracking-label text-text-tertiary uppercase">
+              Directory
+            </p>
+            <h1 className="mt-1 text-page font-semibold leading-heading">Employees</h1>
           </div>
-        </div>
-      </section>
-      <EmployeeProfilePanel
-        employeeId={panelEmployeeId}
-        onClose={() => void setPanelEmployeeId(null)}
-      />
-    </main>
+          <div className="rounded-card border border-border bg-surface">
+            {isLoading ? (
+              <p className="p-5 text-base text-text-secondary">Loading...</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allEmployees.length ? (
+                    allEmployees.map((employee, index) => (
+                      <EmployeeRow
+                        active={index === activeIndex}
+                        employee={employee}
+                        key={employee.id}
+                        onSelect={() => {
+                          setActiveIndex(index);
+                          void setPanelEmployeeId(employee.id);
+                        }}
+                      />
+                    ))
+                  ) : (
+                    <tr>
+                      <TableEmpty colSpan={3}>No employees found</TableEmpty>
+                    </tr>
+                  )}
+                </TableBody>
+              </Table>
+            )}
+            <div className="border-t border-border p-4">
+              <Button
+                disabled={!hasNextPage || employees.isFetching}
+                onClick={() => {
+                  const nextCursor = pages.at(-1)?.page.next_cursor;
+                  if (nextCursor) {
+                    setCursor(nextCursor);
+                  }
+                }}
+                size="sm"
+              >
+                {employees.isFetching && cursor ? "Loading..." : "Load more"}
+              </Button>
+            </div>
+          </div>
+        </section>
+        <EmployeeProfilePanel
+          employeeId={panelEmployeeId}
+          onClose={() => void setPanelEmployeeId(null)}
+        />
+      </main>
+    </AnimatePresence>
   );
 }
 
@@ -193,6 +197,13 @@ function EmployeeRow({
   employee: EmployeeResponse;
   onSelect: () => void;
 }) {
+  // MOTION_SPEC §5 graceful degrade: skip the morph if the source row is
+  // virtualized out of the viewport. No virtualizer is wired up yet (the
+  // directory is well under MOTION_SPEC §10.3's >50-row threshold), so this
+  // is always false today -- not reachable/testable until react-virtual is
+  // added (separate future task, out of scope here).
+  const isVirtualizedAway = false;
+
   return (
     <TableRow
       aria-selected={active}
@@ -204,7 +215,21 @@ function EmployeeRow({
       onClick={onSelect}
       tabIndex={0}
     >
-      <TableCell>{employeeFullName(employee)}</TableCell>
+      <TableCell>
+        {isVirtualizedAway ? (
+          <div className="flex items-center gap-3">
+            <EmployeeAvatar employee={employee} size={28} />
+            <span className="truncate text-[13px] font-medium">{employeeFullName(employee)}</span>
+          </div>
+        ) : (
+          <SharedElement className="flex items-center gap-3" layoutId={`emp-${employee.id}`}>
+            <EmployeeAvatar employee={employee} size={28} />
+            <SharedElementText className="truncate text-[13px] font-medium">
+              {employeeFullName(employee)}
+            </SharedElementText>
+          </SharedElement>
+        )}
+      </TableCell>
       <TableCell>{employee.title}</TableCell>
       <TableCell>
         <StatusPill
