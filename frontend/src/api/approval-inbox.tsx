@@ -1,14 +1,13 @@
 "use client";
 
 import {
-  QueryClient,
   QueryClientProvider,
   useMutation,
   useQueries,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 import {
   approveLeaveRequestMutation as generatedApproveLeaveRequestMutation,
   rejectLeaveRequestMutation as generatedRejectLeaveRequestMutation,
@@ -18,80 +17,19 @@ import {
   getLeaveRequestOptions,
   listLeaveRequestsOptions,
 } from "@/api/generated/@tanstack/react-query.gen";
-import { client } from "@/api/generated/client.gen";
-import { login } from "@/api/generated/sdk.gen";
-import type { EmployeeResponse, LeaveStatus, LoginResponse } from "@/api/generated/types.gen";
+import type { EmployeeResponse, LeaveStatus } from "@/api/generated/types.gen";
+import { createFeatureQueryClient, ensureGeneratedClientConfigured } from "@/api/session";
 
-const demoManagerEmail = "manager@origin-fgl.local";
-const demoPassword = "password";
+export { useDemoManagerSession } from "@/api/session";
+
 const staleTime = 30_000;
 
-let accessToken: string | undefined;
-
-function configureGeneratedClient() {
-  client.setConfig({
-    baseUrl: "",
-    auth: () => accessToken,
-  });
-}
-
-function setAccessToken(token: string) {
-  accessToken = token;
-  configureGeneratedClient();
-}
-
 export function ApprovalInboxApiProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnWindowFocus: false,
-            retry: false,
-            staleTime,
-          },
-          mutations: {
-            retry: false,
-          },
-        },
-      }),
-  );
+  const [queryClient] = useState(() => createFeatureQueryClient());
 
-  configureGeneratedClient();
+  ensureGeneratedClientConfigured();
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-}
-
-export function useDemoManagerSession() {
-  const [tokenReady, setTokenReady] = useState(Boolean(accessToken));
-
-  const session = useQuery({
-    queryKey: ["approval-inbox", "demo-manager-session"],
-    queryFn: async () => {
-      const { data } = await login({
-        body: {
-          email: demoManagerEmail,
-          password: demoPassword,
-        },
-        throwOnError: true,
-      });
-      return data;
-    },
-    staleTime: Number.POSITIVE_INFINITY,
-  });
-
-  useEffect(() => {
-    const data = session.data as LoginResponse | undefined;
-    if (data?.access_token) {
-      setAccessToken(data.access_token);
-      setTokenReady(true);
-    }
-  }, [session.data]);
-
-  return {
-    ...session,
-    tokenReady,
-  };
 }
 
 export function useApprovalInboxCurrentUser(enabled: boolean) {
