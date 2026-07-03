@@ -8,7 +8,9 @@
   "paths": {
     "/api/v1/auth/login": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Login",
         "operationId": "login",
         "requestBody": {
@@ -57,7 +59,9 @@
     },
     "/api/v1/me": {
       "get": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Get Current User",
         "operationId": "get_current_user",
         "responses": {
@@ -99,9 +103,111 @@
         ]
       }
     },
+    "/api/v1/employees": {
+      "get": {
+        "tags": [
+          "employees"
+        ],
+        "summary": "List Employees",
+        "operationId": "list_employees",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Cursor from the previous page.",
+              "title": "Cursor"
+            },
+            "description": "Cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size.",
+              "default": 25,
+              "title": "Limit"
+            },
+            "description": "Page size."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeePage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/employees/{employee_id}": {
       "get": {
-        "tags": ["employees"],
+        "tags": [
+          "employees"
+        ],
         "summary": "Get Employee",
         "operationId": "get_employee",
         "security": [
@@ -162,11 +268,223 @@
             }
           },
           "422": {
-            "description": "Validation Error",
+            "description": "Validation failed.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "employees"
+        ],
+        "summary": "Update Employee",
+        "operationId": "update_employee",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Employee Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/employees/{employee_id}/leave-history": {
+      "get": {
+        "tags": [
+          "employees"
+        ],
+        "summary": "List Employee Leave History",
+        "operationId": "list_employee_leave_history",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Employee Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LeaveStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional status filter.",
+              "title": "Status"
+            },
+            "description": "Optional status filter."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Cursor from the previous page.",
+              "title": "Cursor"
+            },
+            "description": "Cursor from the previous page."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size.",
+              "default": 25,
+              "title": "Limit"
+            },
+            "description": "Page size."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaveRequestPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
                 }
               }
             }
@@ -176,7 +494,9 @@
     },
     "/api/v1/employees/{employee_id}/leave-balance": {
       "get": {
-        "tags": ["employees"],
+        "tags": [
+          "employees"
+        ],
         "summary": "Get Leave Balance",
         "operationId": "get_leave_balance",
         "security": [
@@ -237,11 +557,11 @@
             }
           },
           "422": {
-            "description": "Validation Error",
+            "description": "Validation failed.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ProblemDetail"
                 }
               }
             }
@@ -251,7 +571,9 @@
     },
     "/api/v1/leave-requests": {
       "post": {
-        "tags": ["leave_requests"],
+        "tags": [
+          "leave_requests"
+        ],
         "summary": "Create Leave Request",
         "operationId": "create_leave_request",
         "security": [
@@ -333,7 +655,9 @@
         }
       },
       "get": {
-        "tags": ["leave_requests"],
+        "tags": [
+          "leave_requests"
+        ],
         "summary": "List Leave Requests",
         "operationId": "list_leave_requests",
         "security": [
@@ -459,7 +783,9 @@
     },
     "/api/v1/leave-requests/{leave_request_id}": {
       "get": {
-        "tags": ["leave_requests"],
+        "tags": [
+          "leave_requests"
+        ],
         "summary": "Get Leave Request",
         "operationId": "get_leave_request",
         "security": [
@@ -544,7 +870,9 @@
     },
     "/api/v1/leave-requests/{leave_request_id}/approve": {
       "post": {
-        "tags": ["leave_requests"],
+        "tags": [
+          "leave_requests"
+        ],
         "summary": "Approve Leave Request",
         "operationId": "approve_leave_request",
         "security": [
@@ -629,7 +957,9 @@
     },
     "/api/v1/leave-requests/{leave_request_id}/reject": {
       "post": {
-        "tags": ["leave_requests"],
+        "tags": [
+          "leave_requests"
+        ],
         "summary": "Reject Leave Request",
         "operationId": "reject_leave_request",
         "security": [
@@ -724,7 +1054,9 @@
     },
     "/api/v1/leave-requests/{leave_request_id}/cancel": {
       "post": {
-        "tags": ["leave_requests"],
+        "tags": [
+          "leave_requests"
+        ],
         "summary": "Cancel Leave Request",
         "operationId": "cancel_leave_request",
         "security": [
@@ -840,8 +1172,34 @@
           }
         },
         "type": "object",
-        "required": ["id", "email", "role"],
+        "required": [
+          "id",
+          "email",
+          "role"
+        ],
         "title": "CurrentUserResponse"
+      },
+      "EmployeePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EmployeeResponse"
+            },
+            "type": "array",
+            "title": "Items",
+            "description": "Employee directory page items."
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageInfo",
+            "description": "Cursor page metadata."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "page"
+        ],
+        "title": "EmployeePage"
       },
       "EmployeeResponse": {
         "properties": {
@@ -944,26 +1302,172 @@
       },
       "EmployeeStatus": {
         "type": "string",
-        "enum": ["active", "on_leave", "terminated"],
+        "enum": [
+          "active",
+          "on_leave",
+          "terminated"
+        ],
         "title": "EmployeeStatus"
       },
-      "EmploymentType": {
-        "type": "string",
-        "enum": ["full_time", "part_time", "contractor"],
-        "title": "EmploymentType"
-      },
-      "HTTPValidationError": {
+      "EmployeeUpdate": {
         "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
+          "employee_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employee No",
+            "description": "Stable employee number."
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name",
+            "description": "Employee first name."
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name",
+            "description": "Employee last name."
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email",
+            "description": "Employee work email."
+          },
+          "department_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Department Id",
+            "description": "Department id."
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Job title."
+          },
+          "manager_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manager Id",
+            "description": "Direct manager employee id."
+          },
+          "employment_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EmploymentType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Employment type."
+          },
+          "hire_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hire Date",
+            "description": "Hire date."
+          },
+          "birth_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Date",
+            "description": "Birth date used only for statutory leave defaults."
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Employee lifecycle status."
+          },
+          "termination_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Termination Date",
+            "description": "Termination date if terminated."
           }
         },
         "type": "object",
-        "title": "HTTPValidationError"
+        "title": "EmployeeUpdate"
+      },
+      "EmploymentType": {
+        "type": "string",
+        "enum": [
+          "full_time",
+          "part_time",
+          "contractor"
+        ],
+        "title": "EmploymentType"
       },
       "LeaveBalanceResponse": {
         "properties": {
@@ -1053,7 +1557,12 @@
           }
         },
         "type": "object",
-        "required": ["employee_id", "type", "start_date", "end_date"],
+        "required": [
+          "employee_id",
+          "type",
+          "start_date",
+          "end_date"
+        ],
         "title": "LeaveRequestCreate"
       },
       "LeaveRequestPage": {
@@ -1072,7 +1581,10 @@
           }
         },
         "type": "object",
-        "required": ["items", "page"],
+        "required": [
+          "items",
+          "page"
+        ],
         "title": "LeaveRequestPage"
       },
       "LeaveRequestResponse": {
@@ -1196,12 +1708,24 @@
       },
       "LeaveStatus": {
         "type": "string",
-        "enum": ["pending", "approved", "rejected", "cancelled"],
+        "enum": [
+          "pending",
+          "approved",
+          "rejected",
+          "cancelled"
+        ],
         "title": "LeaveStatus"
       },
       "LeaveType": {
         "type": "string",
-        "enum": ["ANNUAL", "SICK", "UNPAID", "EXCUSE", "MARRIAGE", "BEREAVEMENT"],
+        "enum": [
+          "ANNUAL",
+          "SICK",
+          "UNPAID",
+          "EXCUSE",
+          "MARRIAGE",
+          "BEREAVEMENT"
+        ],
         "title": "LeaveType"
       },
       "LoginRequest": {
@@ -1219,7 +1743,10 @@
           }
         },
         "type": "object",
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "title": "LoginRequest"
       },
       "LoginResponse": {
@@ -1237,7 +1764,9 @@
           }
         },
         "type": "object",
-        "required": ["access_token"],
+        "required": [
+          "access_token"
+        ],
         "title": "LoginResponse"
       },
       "PageInfo": {
@@ -1291,7 +1820,11 @@
           }
         },
         "type": "object",
-        "required": ["title", "status", "detail"],
+        "required": [
+          "title",
+          "status",
+          "detail"
+        ],
         "title": "ProblemDetail"
       },
       "ProblemFieldError": {
@@ -1313,7 +1846,11 @@
           }
         },
         "type": "object",
-        "required": ["field", "code", "message"],
+        "required": [
+          "field",
+          "code",
+          "message"
+        ],
         "title": "ProblemFieldError"
       },
       "RejectLeaveRequestBody": {
@@ -1326,49 +1863,21 @@
           }
         },
         "type": "object",
-        "required": ["reason"],
+        "required": [
+          "reason"
+        ],
         "title": "RejectLeaveRequestBody"
       },
       "Role": {
         "type": "string",
-        "enum": ["employee", "manager", "hr_admin", "executive", "admin"],
+        "enum": [
+          "employee",
+          "manager",
+          "hr_admin",
+          "executive",
+          "admin"
+        ],
         "title": "Role"
-      },
-      "ValidationError": {
-        "properties": {
-          "loc": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
-            },
-            "type": "array",
-            "title": "Location"
-          },
-          "msg": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Error Type"
-          },
-          "input": {
-            "title": "Input"
-          },
-          "ctx": {
-            "type": "object",
-            "title": "Context"
-          }
-        },
-        "type": "object",
-        "required": ["loc", "msg", "type"],
-        "title": "ValidationError"
       }
     },
     "securitySchemes": {

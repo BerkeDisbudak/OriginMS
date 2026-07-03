@@ -42,3 +42,7 @@ def can_cancel_leave_request_endpoint(actor: Actor, request: LeaveRequest) -> bo
 
 def can_list_all_leave_requests(actor: Actor) -> bool:
     return actor.role in HR_READ_ROLES
+
+
+def can_update_employee(actor: Actor) -> bool:
+    return actor.role == Role.HR_ADMIN

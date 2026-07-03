@@ -14,7 +14,10 @@ def test_operation_ids_match_phase2a_table(client: TestClient) -> None:
     assert operation_ids == {
         "login",
         "get_current_user",
+        "list_employees",
         "get_employee",
+        "update_employee",
+        "list_employee_leave_history",
         "get_leave_balance",
         "create_leave_request",
         "list_leave_requests",
