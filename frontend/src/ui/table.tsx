@@ -29,7 +29,7 @@ export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowEle
   return (
     <tr
       className={cn(
-        "h-11 transition-colors duration-fast ease-out hover:bg-surface-raised data-[density=compact]:h-9",
+        "h-11 transition-[color,background-color,border-color] duration-fast ease-out hover:bg-surface-raised data-[density=compact]:h-9",
         className,
       )}
       {...props}

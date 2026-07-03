@@ -97,3 +97,26 @@
     0.938 16.7%, 1.017 20.8%, 1.077 26.9%, 1.086 30.9%, 1.038 41.9%,
     1.001 48.9%, 0.995 55.3%, 1 100%);
 }
+
+/*
+ * Single source of truth for the accent focus ring. Replaces the previous
+ * four-class combo (outline / outline-2 / outline-offset-2 / outline-accent)
+ * whose outline-color was being lost to a cascade interaction among
+ * Tailwind's own individually-generated outline-* utilities -- setting
+ * style/width/color together in one declaration sidesteps that entirely.
+ */
+@utility focus-ring {
+  outline-color: #6366f1;
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: 2px;
+}
+
+/* Same ring, drawn inside the element -- for tightly-packed rows with no
+   surrounding margin where a positive offset would overlap the next row. */
+@utility focus-ring-inset {
+  outline-color: var(--color-accent);
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: -2px;
+}

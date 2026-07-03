@@ -27,7 +27,7 @@ export function Input({
   return (
     <label className="grid gap-2 text-meta font-medium text-text-secondary" htmlFor={inputId}>
       <span>{label}</span>
-      <span className="relative flex h-9 items-center rounded-control border border-border-strong bg-surface text-text-primary transition-colors duration-fast ease-out focus-within:border-accent focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
+      <span className="relative flex h-9 items-center rounded-control border border-border-strong bg-surface text-text-primary transition-[color,background-color,border-color] duration-fast ease-out focus-within:border-accent focus-within:focus-ring">
         {prefix ? (
           <span className="ml-3 flex size-4 items-center text-text-tertiary">{prefix}</span>
         ) : null}

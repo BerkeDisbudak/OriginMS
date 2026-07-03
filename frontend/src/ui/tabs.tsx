@@ -29,8 +29,8 @@ export function Tabs({ activeId, children, items, onActiveIdChange }: TabsProps)
             <button
               aria-selected={active}
               className={cn(
-                "relative pb-3 text-base font-medium outline-none transition-colors duration-fast ease-out",
-                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+                "relative pb-3 text-base font-medium outline-none transition-[color,background-color,border-color] duration-fast ease-out",
+                "focus-visible:focus-ring",
                 active ? "text-text-primary" : "text-text-secondary hover:text-text-primary",
               )}
               id={`tab-${item.id}`}

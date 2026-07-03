@@ -83,8 +83,8 @@ export function Select({
         aria-haspopup="listbox"
         aria-labelledby={`${id}-label ${id}-value`}
         className={cn(
-          "flex h-9 w-full items-center justify-between rounded-control border border-border-strong bg-surface px-3 text-left text-base text-text-primary transition-colors duration-fast ease-out",
-          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+          "flex h-9 w-full items-center justify-between rounded-control border border-border-strong bg-surface px-3 text-left text-base text-text-primary transition-[color,background-color,border-color] duration-fast ease-out",
+          "focus-visible:focus-ring",
           disabled && "cursor-not-allowed opacity-50",
           error && "border-danger",
         )}
@@ -112,7 +112,7 @@ export function Select({
               aria-disabled={item.disabled}
               aria-selected={item.value === value}
               className={cn(
-                "block w-full cursor-pointer px-3 py-2 text-left text-base text-text-primary transition-colors duration-fast ease-out",
+                "block w-full cursor-pointer px-3 py-2 text-left text-base text-text-primary transition-[color,background-color,border-color] duration-fast ease-out",
                 index === activeIndex && "bg-accent-subtle",
                 item.disabled && "cursor-not-allowed opacity-50",
               )}

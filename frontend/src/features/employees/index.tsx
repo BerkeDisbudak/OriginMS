@@ -198,7 +198,7 @@ function EmployeeRow({
       aria-selected={active}
       className={cn(
         "cursor-pointer outline-none",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
+        "focus-visible:focus-ring-inset",
         active ? "bg-surface-raised" : "",
       )}
       onClick={onSelect}

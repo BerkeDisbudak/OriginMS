@@ -41,7 +41,7 @@ export function Palette({ onOpenChange, onSelect, open, sections }: PaletteProps
         <Command className="grid gap-2" label="Command palette">
           <Command.Input
             autoFocus
-            className="h-10 rounded-control border border-border-strong bg-surface px-3 text-base text-text-primary outline-none placeholder:text-text-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="h-10 rounded-control border border-border-strong bg-surface px-3 text-base text-text-primary outline-none placeholder:text-text-tertiary focus-visible:focus-ring"
             placeholder="Search"
           />
           <Command.List className="max-h-96 overflow-auto">
