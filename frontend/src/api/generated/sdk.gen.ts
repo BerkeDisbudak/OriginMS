@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ApproveLeaveRequestData, ApproveLeaveRequestErrors, ApproveLeaveRequestResponses, CancelLeaveRequestData, CancelLeaveRequestErrors, CancelLeaveRequestResponses, CreateLeaveRequestData, CreateLeaveRequestErrors, CreateLeaveRequestResponses, GetCurrentUserData, GetCurrentUserErrors, GetCurrentUserResponses, GetEmployeeData, GetEmployeeErrors, GetEmployeeResponses, GetLeaveBalanceData, GetLeaveBalanceErrors, GetLeaveBalanceResponses, GetLeaveRequestData, GetLeaveRequestErrors, GetLeaveRequestResponses, ListLeaveRequestsData, ListLeaveRequestsErrors, ListLeaveRequestsResponses, LoginData, LoginErrors, LoginResponses, RejectLeaveRequestData, RejectLeaveRequestErrors, RejectLeaveRequestResponses } from './types.gen';
+import type { ApproveLeaveRequestData, ApproveLeaveRequestErrors, ApproveLeaveRequestResponses, CancelLeaveRequestData, CancelLeaveRequestErrors, CancelLeaveRequestResponses, CreateLeaveRequestData, CreateLeaveRequestErrors, CreateLeaveRequestResponses, GetCurrentUserData, GetCurrentUserErrors, GetCurrentUserResponses, GetEmployeeData, GetEmployeeErrors, GetEmployeeResponses, GetLeaveBalanceData, GetLeaveBalanceErrors, GetLeaveBalanceResponses, GetLeaveRequestData, GetLeaveRequestErrors, GetLeaveRequestResponses, ListEmployeeLeaveHistoryData, ListEmployeeLeaveHistoryErrors, ListEmployeeLeaveHistoryResponses, ListEmployeesData, ListEmployeesErrors, ListEmployeesResponses, ListLeaveRequestsData, ListLeaveRequestsErrors, ListLeaveRequestsResponses, LoginData, LoginErrors, LoginResponses, RejectLeaveRequestData, RejectLeaveRequestErrors, RejectLeaveRequestResponses, UpdateEmployeeData, UpdateEmployeeErrors, UpdateEmployeeResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -40,11 +40,42 @@ export const getCurrentUser = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
+ * List Employees
+ */
+export const listEmployees = <ThrowOnError extends boolean = false>(options?: Options<ListEmployeesData, ThrowOnError>): RequestResult<ListEmployeesResponses, ListEmployeesErrors, ThrowOnError> => (options?.client ?? client).get<ListEmployeesResponses, ListEmployeesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/employees',
+    ...options
+});
+
+/**
  * Get Employee
  */
 export const getEmployee = <ThrowOnError extends boolean = false>(options: Options<GetEmployeeData, ThrowOnError>): RequestResult<GetEmployeeResponses, GetEmployeeErrors, ThrowOnError> => (options.client ?? client).get<GetEmployeeResponses, GetEmployeeErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/employees/{employee_id}',
+    ...options
+});
+
+/**
+ * Update Employee
+ */
+export const updateEmployee = <ThrowOnError extends boolean = false>(options: Options<UpdateEmployeeData, ThrowOnError>): RequestResult<UpdateEmployeeResponses, UpdateEmployeeErrors, ThrowOnError> => (options.client ?? client).patch<UpdateEmployeeResponses, UpdateEmployeeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/employees/{employee_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Employee Leave History
+ */
+export const listEmployeeLeaveHistory = <ThrowOnError extends boolean = false>(options: Options<ListEmployeeLeaveHistoryData, ThrowOnError>): RequestResult<ListEmployeeLeaveHistoryResponses, ListEmployeeLeaveHistoryErrors, ThrowOnError> => (options.client ?? client).get<ListEmployeeLeaveHistoryResponses, ListEmployeeLeaveHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/employees/{employee_id}/leave-history',
     ...options
 });
 

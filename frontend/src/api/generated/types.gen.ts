@@ -33,6 +33,22 @@ export type CurrentUserResponse = {
 };
 
 /**
+ * EmployeePage
+ */
+export type EmployeePage = {
+    /**
+     * Items
+     *
+     * Employee directory page items.
+     */
+    items: Array<EmployeeResponse>;
+    /**
+     * Cursor page metadata.
+     */
+    page: PageInfo;
+};
+
+/**
  * EmployeeResponse
  */
 export type EmployeeResponse = {
@@ -118,19 +134,83 @@ export type EmployeeResponse = {
 export type EmployeeStatus = 'active' | 'on_leave' | 'terminated';
 
 /**
+ * EmployeeUpdate
+ */
+export type EmployeeUpdate = {
+    /**
+     * Employee No
+     *
+     * Stable employee number.
+     */
+    employee_no?: string | null;
+    /**
+     * First Name
+     *
+     * Employee first name.
+     */
+    first_name?: string | null;
+    /**
+     * Last Name
+     *
+     * Employee last name.
+     */
+    last_name?: string | null;
+    /**
+     * Email
+     *
+     * Employee work email.
+     */
+    email?: string | null;
+    /**
+     * Department Id
+     *
+     * Department id.
+     */
+    department_id?: string | null;
+    /**
+     * Title
+     *
+     * Job title.
+     */
+    title?: string | null;
+    /**
+     * Manager Id
+     *
+     * Direct manager employee id.
+     */
+    manager_id?: string | null;
+    /**
+     * Employment type.
+     */
+    employment_type?: EmploymentType | null;
+    /**
+     * Hire Date
+     *
+     * Hire date.
+     */
+    hire_date?: string | null;
+    /**
+     * Birth Date
+     *
+     * Birth date used only for statutory leave defaults.
+     */
+    birth_date?: string | null;
+    /**
+     * Employee lifecycle status.
+     */
+    status?: EmployeeStatus | null;
+    /**
+     * Termination Date
+     *
+     * Termination date if terminated.
+     */
+    termination_date?: string | null;
+};
+
+/**
  * EmploymentType
  */
 export type EmploymentType = 'full_time' | 'part_time' | 'contractor';
-
-/**
- * HTTPValidationError
- */
-export type HttpValidationError = {
-    /**
-     * Detail
-     */
-    detail?: Array<ValidationError>;
-};
 
 /**
  * LeaveBalanceResponse
@@ -445,34 +525,6 @@ export type RejectLeaveRequestBody = {
  */
 export type Role = 'employee' | 'manager' | 'hr_admin' | 'executive' | 'admin';
 
-/**
- * ValidationError
- */
-export type ValidationError = {
-    /**
-     * Location
-     */
-    loc: Array<string | number>;
-    /**
-     * Message
-     */
-    msg: string;
-    /**
-     * Error Type
-     */
-    type: string;
-    /**
-     * Input
-     */
-    input?: unknown;
-    /**
-     * Context
-     */
-    ctx?: {
-        [key: string]: unknown;
-    };
-};
-
 export type LoginData = {
     body: LoginRequest;
     path?: never;
@@ -531,6 +583,56 @@ export type GetCurrentUserResponses = {
 
 export type GetCurrentUserResponse = GetCurrentUserResponses[keyof GetCurrentUserResponses];
 
+export type ListEmployeesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Cursor
+         *
+         * Cursor from the previous page.
+         */
+        cursor?: string | null;
+        /**
+         * Limit
+         *
+         * Page size.
+         */
+        limit?: number;
+    };
+    url: '/api/v1/employees';
+};
+
+export type ListEmployeesErrors = {
+    /**
+     * Unauthorized.
+     */
+    401: ProblemDetail;
+    /**
+     * Forbidden.
+     */
+    403: ProblemDetail;
+    /**
+     * Not found.
+     */
+    404: ProblemDetail;
+    /**
+     * Validation failed.
+     */
+    422: ProblemDetail;
+};
+
+export type ListEmployeesError = ListEmployeesErrors[keyof ListEmployeesErrors];
+
+export type ListEmployeesResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmployeePage;
+};
+
+export type ListEmployeesResponse = ListEmployeesResponses[keyof ListEmployeesResponses];
+
 export type GetEmployeeData = {
     body?: never;
     path: {
@@ -557,9 +659,9 @@ export type GetEmployeeErrors = {
      */
     404: ProblemDetail;
     /**
-     * Validation Error
+     * Validation failed.
      */
-    422: HttpValidationError;
+    422: ProblemDetail;
 };
 
 export type GetEmployeeError = GetEmployeeErrors[keyof GetEmployeeErrors];
@@ -572,6 +674,109 @@ export type GetEmployeeResponses = {
 };
 
 export type GetEmployeeResponse = GetEmployeeResponses[keyof GetEmployeeResponses];
+
+export type UpdateEmployeeData = {
+    body: EmployeeUpdate;
+    path: {
+        /**
+         * Employee Id
+         */
+        employee_id: string;
+    };
+    query?: never;
+    url: '/api/v1/employees/{employee_id}';
+};
+
+export type UpdateEmployeeErrors = {
+    /**
+     * Unauthorized.
+     */
+    401: ProblemDetail;
+    /**
+     * Forbidden.
+     */
+    403: ProblemDetail;
+    /**
+     * Not found.
+     */
+    404: ProblemDetail;
+    /**
+     * Validation failed.
+     */
+    422: ProblemDetail;
+};
+
+export type UpdateEmployeeError = UpdateEmployeeErrors[keyof UpdateEmployeeErrors];
+
+export type UpdateEmployeeResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmployeeResponse;
+};
+
+export type UpdateEmployeeResponse = UpdateEmployeeResponses[keyof UpdateEmployeeResponses];
+
+export type ListEmployeeLeaveHistoryData = {
+    body?: never;
+    path: {
+        /**
+         * Employee Id
+         */
+        employee_id: string;
+    };
+    query?: {
+        /**
+         * Status
+         *
+         * Optional status filter.
+         */
+        status?: LeaveStatus | null;
+        /**
+         * Cursor
+         *
+         * Cursor from the previous page.
+         */
+        cursor?: string | null;
+        /**
+         * Limit
+         *
+         * Page size.
+         */
+        limit?: number;
+    };
+    url: '/api/v1/employees/{employee_id}/leave-history';
+};
+
+export type ListEmployeeLeaveHistoryErrors = {
+    /**
+     * Unauthorized.
+     */
+    401: ProblemDetail;
+    /**
+     * Forbidden.
+     */
+    403: ProblemDetail;
+    /**
+     * Not found.
+     */
+    404: ProblemDetail;
+    /**
+     * Validation failed.
+     */
+    422: ProblemDetail;
+};
+
+export type ListEmployeeLeaveHistoryError = ListEmployeeLeaveHistoryErrors[keyof ListEmployeeLeaveHistoryErrors];
+
+export type ListEmployeeLeaveHistoryResponses = {
+    /**
+     * Successful Response
+     */
+    200: LeaveRequestPage;
+};
+
+export type ListEmployeeLeaveHistoryResponse = ListEmployeeLeaveHistoryResponses[keyof ListEmployeeLeaveHistoryResponses];
 
 export type GetLeaveBalanceData = {
     body?: never;
@@ -599,9 +804,9 @@ export type GetLeaveBalanceErrors = {
      */
     404: ProblemDetail;
     /**
-     * Validation Error
+     * Validation failed.
      */
-    422: HttpValidationError;
+    422: ProblemDetail;
 };
 
 export type GetLeaveBalanceError = GetLeaveBalanceErrors[keyof GetLeaveBalanceErrors];

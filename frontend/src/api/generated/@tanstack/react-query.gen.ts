@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { approveLeaveRequest, cancelLeaveRequest, createLeaveRequest, getCurrentUser, getEmployee, getLeaveBalance, getLeaveRequest, listLeaveRequests, login, type Options, rejectLeaveRequest } from '../sdk.gen';
-import type { ApproveLeaveRequestData, ApproveLeaveRequestError, ApproveLeaveRequestResponse, CancelLeaveRequestData, CancelLeaveRequestError, CancelLeaveRequestResponse, CreateLeaveRequestData, CreateLeaveRequestError, CreateLeaveRequestResponse, GetCurrentUserData, GetCurrentUserError, GetCurrentUserResponse, GetEmployeeData, GetEmployeeError, GetEmployeeResponse, GetLeaveBalanceData, GetLeaveBalanceError, GetLeaveBalanceResponse, GetLeaveRequestData, GetLeaveRequestError, GetLeaveRequestResponse, ListLeaveRequestsData, ListLeaveRequestsError, ListLeaveRequestsResponse, LoginData, LoginError, LoginResponse2, RejectLeaveRequestData, RejectLeaveRequestError, RejectLeaveRequestResponse } from '../types.gen';
+import { approveLeaveRequest, cancelLeaveRequest, createLeaveRequest, getCurrentUser, getEmployee, getLeaveBalance, getLeaveRequest, listEmployeeLeaveHistory, listEmployees, listLeaveRequests, login, type Options, rejectLeaveRequest, updateEmployee } from '../sdk.gen';
+import type { ApproveLeaveRequestData, ApproveLeaveRequestError, ApproveLeaveRequestResponse, CancelLeaveRequestData, CancelLeaveRequestError, CancelLeaveRequestResponse, CreateLeaveRequestData, CreateLeaveRequestError, CreateLeaveRequestResponse, GetCurrentUserData, GetCurrentUserError, GetCurrentUserResponse, GetEmployeeData, GetEmployeeError, GetEmployeeResponse, GetLeaveBalanceData, GetLeaveBalanceError, GetLeaveBalanceResponse, GetLeaveRequestData, GetLeaveRequestError, GetLeaveRequestResponse, ListEmployeeLeaveHistoryData, ListEmployeeLeaveHistoryError, ListEmployeeLeaveHistoryResponse, ListEmployeesData, ListEmployeesError, ListEmployeesResponse, ListLeaveRequestsData, ListLeaveRequestsError, ListLeaveRequestsResponse, LoginData, LoginError, LoginResponse2, RejectLeaveRequestData, RejectLeaveRequestError, RejectLeaveRequestResponse, UpdateEmployeeData, UpdateEmployeeError, UpdateEmployeeResponse } from '../types.gen';
 
 /**
  * Login
@@ -74,6 +74,83 @@ export const getCurrentUserOptions = (options?: Options<GetCurrentUserData>) => 
     queryKey: getCurrentUserQueryKey(options)
 });
 
+export const listEmployeesQueryKey = (options?: Options<ListEmployeesData>) => createQueryKey('listEmployees', options);
+
+/**
+ * List Employees
+ */
+export const listEmployeesOptions = (options?: Options<ListEmployeesData>) => queryOptions<ListEmployeesResponse, ListEmployeesError, ListEmployeesResponse, ReturnType<typeof listEmployeesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listEmployees({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listEmployeesQueryKey(options)
+});
+
+const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
+    const params = { ...queryKey[0] };
+    if (page.body) {
+        params.body = {
+            ...queryKey[0].body as any,
+            ...page.body as any
+        };
+    }
+    if (page.headers) {
+        params.headers = {
+            ...queryKey[0].headers,
+            ...page.headers
+        };
+    }
+    if (page.path) {
+        params.path = {
+            ...queryKey[0].path as any,
+            ...page.path as any
+        };
+    }
+    if (page.query) {
+        params.query = {
+            ...queryKey[0].query as any,
+            ...page.query as any
+        };
+    }
+    return params as unknown as typeof page;
+};
+
+export const listEmployeesInfiniteQueryKey = (options?: Options<ListEmployeesData>): QueryKey<Options<ListEmployeesData>> => createQueryKey('listEmployees', options, true);
+
+/**
+ * List Employees
+ */
+export const listEmployeesInfiniteOptions = (options?: Options<ListEmployeesData>) => {
+    const opts = infiniteQueryOptions<ListEmployeesResponse, ListEmployeesError, InfiniteData<ListEmployeesResponse>, QueryKey<Options<ListEmployeesData>>, string | null | Pick<QueryKey<Options<ListEmployeesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListEmployeesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listEmployees({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listEmployeesInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
 export const getEmployeeQueryKey = (options: Options<GetEmployeeData>) => createQueryKey('getEmployee', options);
 
 /**
@@ -91,6 +168,71 @@ export const getEmployeeOptions = (options: Options<GetEmployeeData>) => queryOp
     },
     queryKey: getEmployeeQueryKey(options)
 });
+
+/**
+ * Update Employee
+ */
+export const updateEmployeeMutation = (options?: Partial<Options<UpdateEmployeeData>>): UseMutationOptions<UpdateEmployeeResponse, UpdateEmployeeError, Options<UpdateEmployeeData>> => {
+    const mutationOptions: UseMutationOptions<UpdateEmployeeResponse, UpdateEmployeeError, Options<UpdateEmployeeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateEmployee({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listEmployeeLeaveHistoryQueryKey = (options: Options<ListEmployeeLeaveHistoryData>) => createQueryKey('listEmployeeLeaveHistory', options);
+
+/**
+ * List Employee Leave History
+ */
+export const listEmployeeLeaveHistoryOptions = (options: Options<ListEmployeeLeaveHistoryData>) => queryOptions<ListEmployeeLeaveHistoryResponse, ListEmployeeLeaveHistoryError, ListEmployeeLeaveHistoryResponse, ReturnType<typeof listEmployeeLeaveHistoryQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listEmployeeLeaveHistory({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listEmployeeLeaveHistoryQueryKey(options)
+});
+
+export const listEmployeeLeaveHistoryInfiniteQueryKey = (options: Options<ListEmployeeLeaveHistoryData>): QueryKey<Options<ListEmployeeLeaveHistoryData>> => createQueryKey('listEmployeeLeaveHistory', options, true);
+
+/**
+ * List Employee Leave History
+ */
+export const listEmployeeLeaveHistoryInfiniteOptions = (options: Options<ListEmployeeLeaveHistoryData>) => {
+    const opts = infiniteQueryOptions<ListEmployeeLeaveHistoryResponse, ListEmployeeLeaveHistoryError, InfiniteData<ListEmployeeLeaveHistoryResponse>, QueryKey<Options<ListEmployeeLeaveHistoryData>>, string | null | Pick<QueryKey<Options<ListEmployeeLeaveHistoryData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListEmployeeLeaveHistoryData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listEmployeeLeaveHistory({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listEmployeeLeaveHistoryInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
 
 export const getLeaveBalanceQueryKey = (options: Options<GetLeaveBalanceData>) => createQueryKey('getLeaveBalance', options);
 
@@ -127,35 +269,6 @@ export const listLeaveRequestsOptions = (options?: Options<ListLeaveRequestsData
     },
     queryKey: listLeaveRequestsQueryKey(options)
 });
-
-const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
-    const params = { ...queryKey[0] };
-    if (page.body) {
-        params.body = {
-            ...queryKey[0].body as any,
-            ...page.body as any
-        };
-    }
-    if (page.headers) {
-        params.headers = {
-            ...queryKey[0].headers,
-            ...page.headers
-        };
-    }
-    if (page.path) {
-        params.path = {
-            ...queryKey[0].path as any,
-            ...page.path as any
-        };
-    }
-    if (page.query) {
-        params.query = {
-            ...queryKey[0].query as any,
-            ...page.query as any
-        };
-    }
-    return params as unknown as typeof page;
-};
 
 export const listLeaveRequestsInfiniteQueryKey = (options?: Options<ListLeaveRequestsData>): QueryKey<Options<ListLeaveRequestsData>> => createQueryKey('listLeaveRequests', options, true);
 
