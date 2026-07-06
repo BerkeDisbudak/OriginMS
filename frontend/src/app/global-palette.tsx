@@ -7,6 +7,7 @@ import { Palette, type PaletteItem, type PaletteSection } from "@/ui";
 // TODO: move this to a shared route registry once Phase 3 adds more than 2-3 routes.
 const routesById: Record<string, string> = {
   "approval-inbox": "/",
+  dashboard: "/dashboard",
   employees: "/employees",
 };
 
@@ -17,6 +18,7 @@ const sections: PaletteSection[] = [
     items: [
       { id: "approval-inbox", label: "Approval Inbox" },
       { id: "employees", label: "Employees" },
+      { id: "dashboard", label: "Dashboard" },
     ],
   },
 ];
