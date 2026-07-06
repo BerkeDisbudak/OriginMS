@@ -11,6 +11,9 @@ importers:
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-focus-scope':
+        specifier: ^1.1.11
+        version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-query':
         specifier: ^5.90.12
         version: 5.101.2(react@19.2.7)
@@ -112,11 +115,7 @@ importers:
         specifier: ^4.0.15
         version: 4.1.9(@types/node@24.13.2)(jsdom@29.1.1)(vite@8.1.2(@types/node@24.13.2)(esbuild@0.28.1)(jiti@2.7.0))
 
-  frontend:
-    dependencies:
-      '@radix-ui/react-focus-scope':
-        specifier: ^1.1.11
-        version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+  frontend: {}
 
 packages:
 
