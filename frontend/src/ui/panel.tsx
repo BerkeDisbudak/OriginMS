@@ -1,7 +1,9 @@
 "use client";
 
 import { X } from "@phosphor-icons/react";
+import { FocusScope } from "@radix-ui/react-focus-scope";
 import type { ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "./button";
 import { PanelMotion } from "./motion/panel-motion";
@@ -18,6 +20,9 @@ export type PanelProps = {
   title: string;
 };
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function Panel({
   actions,
   children,
@@ -29,10 +34,34 @@ export function Panel({
   status,
   title,
 }: PanelProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const wasOpen = useRef(open);
+
+  // Panel/PanelMotion stay permanently mounted so the slide animation always
+  // has a stable node -- so focus-in and focus-restore can't rely on
+  // FocusScope's own mount/unmount lifecycle. They're driven manually off the
+  // `open` transition instead; FocusScope is only used for the Tab trap
+  // itself (via its `trapped` prop, which does support being toggled).
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      triggerRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const dialogEl = containerRef.current?.querySelector<HTMLElement>('[role="dialog"]');
+      const firstFocusable = dialogEl?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+      (firstFocusable ?? dialogEl)?.focus();
+    } else if (!open && wasOpen.current) {
+      triggerRef.current?.focus();
+      triggerRef.current = null;
+    }
+    wasOpen.current = open;
+  }, [open]);
+
   return (
     <div
       aria-hidden={!open}
       className={cn("fixed inset-0 z-40", open ? "pointer-events-auto" : "pointer-events-none")}
+      ref={containerRef}
     >
       <button
         aria-label="Close panel"
@@ -52,24 +81,35 @@ export function Panel({
         disableEntrySlide={disableEntrySlide}
         open={open}
         role="dialog"
+        tabIndex={-1}
       >
-        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border px-5">
-          <div className="min-w-0 flex-1">
-            <h2 className="truncate text-section font-semibold text-text-primary">{title}</h2>
+        <FocusScope
+          asChild
+          loop
+          onMountAutoFocus={(event) => event.preventDefault()}
+          onUnmountAutoFocus={(event) => event.preventDefault()}
+          trapped={open}
+        >
+          <div className="contents">
+            <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border px-5">
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-section font-semibold text-text-primary">{title}</h2>
+              </div>
+              {status}
+              {actions}
+              <Button
+                aria-label="Close panel"
+                onClick={() => onOpenChange(false)}
+                size="sm"
+                variant="ghost"
+              >
+                <X aria-hidden="true" size={16} />
+              </Button>
+            </header>
+            <div className="min-h-0 flex-1 overflow-auto p-5">{children}</div>
+            {footer ? <footer className="border-t border-border p-5">{footer}</footer> : null}
           </div>
-          {status}
-          {actions}
-          <Button
-            aria-label="Close panel"
-            onClick={() => onOpenChange(false)}
-            size="sm"
-            variant="ghost"
-          >
-            <X aria-hidden="true" size={16} />
-          </Button>
-        </header>
-        <div className="min-h-0 flex-1 overflow-auto p-5">{children}</div>
-        {footer ? <footer className="border-t border-border p-5">{footer}</footer> : null}
+        </FocusScope>
       </PanelMotion>
     </div>
   );

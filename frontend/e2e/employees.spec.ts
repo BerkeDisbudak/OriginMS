@@ -120,21 +120,50 @@ test("keyboard interrupt-spam retargets cleanly with no console errors", async (
   expect(consoleErrors).toEqual([]);
 });
 
-// Known gap, not introduced by the morph: ui/panel.tsx has no focus trap or
-// auto-focus, so keyboard Tab after opening the panel keeps cycling through
-// the directory rows underneath instead of entering the panel. Pre-existing
-// since 3b's plain slide-in (never caught because 3b's keyboard tests didn't
-// check Tab-into-panel specifically); out of scope to fix in this pass.
-test.fixme("keyboard Tab after opening lands inside the panel, not the directory rows", async ({
-  page,
-}) => {
+test("keyboard Tab after opening lands inside the panel and stays trapped", async ({ page }) => {
   await openDirectory(page);
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("dialog")).toBeVisible();
+
+  const panel = page.getByRole("dialog");
+  await expect(panel).toBeVisible({ timeout: 10_000 });
+  await expect(panel.getByText("Leave balance")).toBeVisible();
 
   await page.keyboard.press("Tab");
   const focusedInsidePanel = await page.evaluate(
     () => !!document.activeElement?.closest('[role="dialog"]'),
   );
   expect(focusedInsidePanel).toBe(true);
+
+  // Tab all the way through the panel's focusable elements -- it must wrap
+  // back inside the panel rather than escaping to the directory rows behind it.
+  for (let i = 0; i < 15; i++) {
+    await page.keyboard.press("Tab");
+  }
+  const stillTrappedForward = await page.evaluate(
+    () => !!document.activeElement?.closest('[role="dialog"]'),
+  );
+  expect(stillTrappedForward).toBe(true);
+
+  for (let i = 0; i < 15; i++) {
+    await page.keyboard.press("Shift+Tab");
+  }
+  const stillTrappedBackward = await page.evaluate(
+    () => !!document.activeElement?.closest('[role="dialog"]'),
+  );
+  expect(stillTrappedBackward).toBe(true);
+});
+
+test("closing the panel returns focus to the triggering row", async ({ page }) => {
+  await openDirectory(page);
+
+  const firstRow = page.locator("tbody tr").first();
+  await firstRow.click();
+
+  const panel = page.getByRole("dialog");
+  await expect(panel).toBeVisible({ timeout: 10_000 });
+  await expect(panel.getByText("Leave balance")).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeHidden();
+  await expect(firstRow).toBeFocused();
 });
