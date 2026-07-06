@@ -1,11 +1,17 @@
 # pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
-from datetime import timedelta
+from datetime import date, timedelta
 
 from conftest import login, problem
 from fastapi.testclient import TestClient
 
 from origin_ms.core.time import today_istanbul
 from origin_ms.services.unit_of_work import InMemoryUnitOfWork
+
+
+def _next_business_day(candidate: date, holidays: set[date]) -> date:
+    while candidate.weekday() >= 5 or candidate in holidays:
+        candidate += timedelta(days=1)
+    return candidate
 
 
 def test_end_before_start_returns_field_problem(client: TestClient) -> None:
@@ -77,14 +83,25 @@ def test_insufficient_balance_returns_field_problem(
     )
     headers = login(client, "employee@origin-fgl.local")
 
+    # Must land on an actual business day or the "no business days in range"
+    # check fires before the balance check this test is exercising. Advances
+    # from today + 90 using the same holiday data the request will be
+    # validated against (uow.public_holidays), not a hand-copied list.
+    # Known edge case: public_holidays only seeds today.year, so a scan that
+    # crosses into January of the next year (only reachable if "today" is in
+    # roughly the last two weeks of December) could pick an unseeded holiday
+    # as a false business day -- an existing limitation of the demo seed data.
+    holiday_dates = {holiday.date for holiday in uow.public_holidays.values()}
+    request_date = _next_business_day(today + timedelta(days=90), holiday_dates)
+
     response = client.post(
         "/api/v1/leave-requests",
         headers=headers,
         json={
             "employee_id": "emp_employee",
             "type": "ANNUAL",
-            "start_date": str(today + timedelta(days=90)),
-            "end_date": str(today + timedelta(days=90)),
+            "start_date": str(request_date),
+            "end_date": str(request_date),
         },
     )
 
