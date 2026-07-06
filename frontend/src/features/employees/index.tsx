@@ -219,12 +219,12 @@ function EmployeeRow({
         {isVirtualizedAway ? (
           <div className="flex items-center gap-3">
             <EmployeeAvatar employee={employee} size={28} />
-            <span className="truncate text-[13px] font-medium">{employeeFullName(employee)}</span>
+            <span className="truncate text-dense font-medium">{employeeFullName(employee)}</span>
           </div>
         ) : (
           <SharedElement className="flex items-center gap-3" layoutId={`emp-${employee.id}`}>
             <EmployeeAvatar employee={employee} size={28} />
-            <SharedElementText className="truncate text-[13px] font-medium">
+            <SharedElementText className="truncate text-dense font-medium">
               {employeeFullName(employee)}
             </SharedElementText>
           </SharedElement>

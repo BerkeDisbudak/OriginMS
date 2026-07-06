@@ -72,7 +72,7 @@ export function EmployeeProfilePanel({
                 onMorphComplete={() => setMorphSettled(true)}
               >
                 <EmployeeAvatar employee={employee} size={40} />
-                <SharedElementText className="truncate text-[16px] font-semibold text-text-primary">
+                <SharedElementText className="truncate text-section font-semibold text-text-primary">
                   {employeeFullName(employee)}
                 </SharedElementText>
               </SharedElement>
@@ -90,7 +90,11 @@ export function EmployeeProfilePanel({
                 <DotsThree aria-hidden="true" size={16} />
               </Button>
             </div>
-            <p className="mt-2 truncate pl-[52px] text-meta text-text-secondary">
+            {/* pl-12 (48px, nearest scale step to the avatar(40)+gap-3(12)=52px
+                indent) -- a 4px sub-alignment vs. the name above is an
+                acceptable trade to stay on-scale, rather than resizing the
+                avatar/gap shared with the row's morph-matching classes. */}
+            <p className="mt-2 truncate pl-12 text-meta text-text-secondary">
               {employee.title} &middot; {employee.department_id}
             </p>
           </div>
