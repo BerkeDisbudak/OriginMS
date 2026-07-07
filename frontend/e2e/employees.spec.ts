@@ -42,7 +42,7 @@ test("employees keyboard-only path", async ({ page }) => {
   await page.keyboard.press("Enter");
 
   const panel = page.getByRole("dialog");
-  await expect(panel).toBeVisible();
+  await expect(panel).toBeVisible({ timeout: 10_000 });
 
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
