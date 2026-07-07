@@ -11,7 +11,15 @@ class Base(DeclarativeBase):
 
 
 settings = get_settings()
-engine = create_async_engine(settings.database_url, future=True)
+engine = create_async_engine(
+    settings.database_url,
+    future=True,
+    # Defensive: PgBouncer's Session mode doesn't need this (each client
+    # gets a real dedicated server connection), but Transaction mode does --
+    # protects against prepared-statement conflicts if this pooler ever
+    # behaves like transaction mode under load. Harmless either way.
+    connect_args={"statement_cache_size": 0},
+)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 

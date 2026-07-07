@@ -28,6 +28,12 @@ def create_app(uow: InMemoryUnitOfWork | None = None) -> FastAPI:
         description="Phase 2a backend contract for Approval Inbox.",
     )
     app.state.uow = uow or build_demo_uow()
+    # An explicit `uow` (every test, via conftest.py's fixture) always wins
+    # and always means in-memory, regardless of ORIGIN_MS_DATABASE_URL --
+    # get_uow() only consults settings when create_app() is called bare, the
+    # way the real `app = create_app()` below (what uvicorn actually serves)
+    # does.
+    app.state.uses_explicit_uow = uow is not None
 
     app.middleware("http")(request_id_middleware)
     install_error_handlers(app)

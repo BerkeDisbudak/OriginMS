@@ -6,6 +6,7 @@ from sqlalchemy import (
     CheckConstraint,
     Date,
     DateTime,
+    Enum,
     ForeignKey,
     Index,
     Integer,
@@ -16,6 +17,35 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from origin_ms.repositories.database import Base
+
+# create_type=False everywhere below: the migration
+# (20260702_0001_phase2a_hr_leave_auth_audit.py) already creates these
+# native Postgres enum types explicitly; these just need to bind to them by
+# name so INSERT/UPDATE values are sent with the right type instead of a
+# plain VARCHAR (which Postgres rejects for a column typed as a real enum).
+RoleEnum = Enum(
+    "employee", "manager", "hr_admin", "executive", "admin", name="role", create_type=False
+)
+ActorTypeEnum = Enum("user", "agent", "system", name="actor_type", create_type=False)
+EmploymentTypeEnum = Enum(
+    "full_time", "part_time", "contractor", name="employment_type", create_type=False
+)
+EmployeeStatusEnum = Enum(
+    "active", "on_leave", "terminated", name="employee_status", create_type=False
+)
+LeaveTypeEnum = Enum(
+    "ANNUAL",
+    "SICK",
+    "UNPAID",
+    "EXCUSE",
+    "MARRIAGE",
+    "BEREAVEMENT",
+    name="leave_type",
+    create_type=False,
+)
+LeaveStatusEnum = Enum(
+    "pending", "approved", "rejected", "cancelled", name="leave_status", create_type=False
+)
 
 
 class DepartmentModel(Base):
@@ -42,10 +72,10 @@ class EmployeeModel(Base):
     department_id: Mapped[str] = mapped_column(ForeignKey("departments.id"), nullable=False)
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     manager_id: Mapped[str | None] = mapped_column(ForeignKey("employees.id"), nullable=True)
-    employment_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    employment_type: Mapped[str] = mapped_column(EmploymentTypeEnum, nullable=False)
     hire_date: Mapped[date_type] = mapped_column(Date, nullable=False)
     birth_date: Mapped[date_type] = mapped_column(Date, nullable=False)
-    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    status: Mapped[str] = mapped_column(EmployeeStatusEnum, nullable=False)
     termination_date: Mapped[date_type | None] = mapped_column(Date, nullable=True)
 
 
@@ -56,7 +86,7 @@ class UserModel(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(String(32), nullable=False)
+    role: Mapped[str] = mapped_column(RoleEnum, nullable=False)
     employee_id: Mapped[str | None] = mapped_column(ForeignKey("employees.id"), nullable=True)
 
 
@@ -95,12 +125,12 @@ class LeaveRequestModel(Base):
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True)
     employee_id: Mapped[str] = mapped_column(ForeignKey("employees.id"), nullable=False)
-    type: Mapped[str] = mapped_column(String(32), nullable=False)
+    type: Mapped[str] = mapped_column(LeaveTypeEnum, nullable=False)
     start_date: Mapped[date_type] = mapped_column(Date, nullable=False)
     end_date: Mapped[date_type] = mapped_column(Date, nullable=False)
     business_days: Mapped[int] = mapped_column(Integer, nullable=False)
     note: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    status: Mapped[str] = mapped_column(LeaveStatusEnum, nullable=False)
     decided_by: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     decision_reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
@@ -117,7 +147,7 @@ class AuditEventModel(Base):
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True)
     ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    actor_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    actor_type: Mapped[str] = mapped_column(ActorTypeEnum, nullable=False)
     actor_id: Mapped[str] = mapped_column(String(64), nullable=False)
     action: Mapped[str] = mapped_column(String(120), nullable=False)
     entity_type: Mapped[str] = mapped_column(String(80), nullable=False)

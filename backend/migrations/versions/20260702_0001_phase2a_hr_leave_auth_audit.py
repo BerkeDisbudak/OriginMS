@@ -16,22 +16,53 @@ down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-role_enum = postgresql.ENUM("employee", "manager", "hr_admin", "executive", "admin", name="role")
-actor_type_enum = postgresql.ENUM("user", "agent", "system", name="actor_type")
-employment_type_enum = postgresql.ENUM(
-    "full_time", "part_time", "contractor", name="employment_type"
+FLAT_ENUM_KWARGS = {"create_type": False}
+
+role_enum = postgresql.ENUM(
+    "employee", "manager", "hr_admin", "executive", "admin", name="role", **FLAT_ENUM_KWARGS
 )
-employee_status_enum = postgresql.ENUM("active", "on_leave", "terminated", name="employee_status")
+actor_type_enum = postgresql.ENUM("user", "agent", "system", name="actor_type", **FLAT_ENUM_KWARGS)
+employment_type_enum = postgresql.ENUM(
+    "full_time", "part_time", "contractor", name="employment_type", **FLAT_ENUM_KWARGS
+)
+employee_status_enum = postgresql.ENUM(
+    "active", "on_leave", "terminated", name="employee_status", **FLAT_ENUM_KWARGS
+)
 leave_type_enum = postgresql.ENUM(
-    "ANNUAL", "SICK", "UNPAID", "EXCUSE", "MARRIAGE", "BEREAVEMENT", name="leave_type"
+    "ANNUAL",
+    "SICK",
+    "UNPAID",
+    "EXCUSE",
+    "MARRIAGE",
+    "BEREAVEMENT",
+    name="leave_type",
+    **FLAT_ENUM_KWARGS,
 )
 leave_status_enum = postgresql.ENUM(
-    "pending", "approved", "rejected", "cancelled", name="leave_status"
+    "pending", "approved", "rejected", "cancelled", name="leave_status", **FLAT_ENUM_KWARGS
 )
+
+
+def _create_enum_type(enum: postgresql.ENUM) -> None:
+    # Avoids relying on SQLAlchemy's own checkfirst existence-check, which
+    # doesn't reliably see this migration's own preceding statements under
+    # the async-engine/run_sync bridge this env.py requires -- Postgres's own
+    # idiomatic "create if not exists" for types is this exception-swallowing
+    # DO block, since CREATE TYPE IF NOT EXISTS isn't valid syntax.
+    values = ", ".join(f"'{value}'" for value in enum.enums)
+    op.execute(
+        f"""
+        DO $$
+        BEGIN
+            CREATE TYPE {enum.name} AS ENUM ({values});
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END $$;
+        """
+    )
 
 
 def upgrade() -> None:
-    bind = op.get_bind()
     for enum in (
         role_enum,
         actor_type_enum,
@@ -40,7 +71,7 @@ def upgrade() -> None:
         leave_type_enum,
         leave_status_enum,
     ):
-        enum.create(bind, checkfirst=True)
+        _create_enum_type(enum)
 
     op.create_table(
         "departments",
@@ -174,7 +205,6 @@ def downgrade() -> None:
     op.drop_constraint("fk_departments_manager_id", "departments", type_="foreignkey")
     op.drop_table("employees")
     op.drop_table("departments")
-    bind = op.get_bind()
     for enum in (
         leave_status_enum,
         leave_type_enum,
@@ -183,4 +213,4 @@ def downgrade() -> None:
         actor_type_enum,
         role_enum,
     ):
-        enum.drop(bind, checkfirst=True)
+        op.execute(f"DROP TYPE IF EXISTS {enum.name}")

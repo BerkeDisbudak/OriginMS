@@ -1,12 +1,15 @@
+from collections.abc import AsyncIterator
 from typing import Annotated, cast
 
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from origin_ms.core.config import Settings, get_settings
+from origin_ms.core.config import Settings, get_settings, uses_real_database
 from origin_ms.core.security import decode_token
 from origin_ms.domain.entities import Actor
 from origin_ms.domain.errors import DomainError
+from origin_ms.repositories.database import SessionLocal
+from origin_ms.repositories.sqlalchemy_uow import SqlAlchemyUnitOfWork
 from origin_ms.services.auth_service import AuthService, actor_from_user
 from origin_ms.services.employee_service import EmployeeService
 from origin_ms.services.leave_service import LeaveService
@@ -15,8 +18,26 @@ from origin_ms.services.unit_of_work import UnitOfWork
 bearer = HTTPBearer(auto_error=False)
 
 
-def get_uow(request: Request) -> UnitOfWork:
-    return cast(UnitOfWork, request.app.state.uow)
+async def get_uow(
+    request: Request,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> AsyncIterator[UnitOfWork]:
+    # An explicit uow (every test, via conftest.py's fixture) always wins and
+    # always means in-memory -- real persistence is only selected for the
+    # bare `create_app()` entrypoint (what uvicorn actually serves) when
+    # ORIGIN_MS_DATABASE_URL has been overridden (real env var or backend/.env).
+    if not request.app.state.uses_explicit_uow and uses_real_database(settings):
+        async with SessionLocal() as session:
+            uow = SqlAlchemyUnitOfWork(session)
+            await uow.load()
+            try:
+                yield cast(UnitOfWork, uow)
+                await uow.commit()
+            except Exception:
+                await uow.rollback()
+                raise
+    else:
+        yield cast(UnitOfWork, request.app.state.uow)
 
 
 def get_request_id(request: Request) -> str:
