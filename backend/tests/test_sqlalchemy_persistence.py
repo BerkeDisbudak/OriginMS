@@ -113,9 +113,7 @@ def seeded_database() -> None:
 
 
 def _login(client: TestClient, email: str) -> dict[str, str]:
-    response = client.post(
-        "/api/v1/auth/login", json={"email": email, "password": "password"}
-    )
+    response = client.post("/api/v1/auth/login", json={"email": email, "password": "password"})
     assert response.status_code == 200
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 

@@ -50,9 +50,7 @@ async def seed() -> None:
             await session.merge(PublicHolidayModel(**holiday.model_dump()))
 
         for balance in uow.leave_balances.values():
-            await session.merge(
-                LeaveBalanceModel(**balance.model_dump(exclude={"remaining"}))
-            )
+            await session.merge(LeaveBalanceModel(**balance.model_dump(exclude={"remaining"})))
 
         for request in uow.leave_requests.values():
             await session.merge(LeaveRequestModel(**request.model_dump()))

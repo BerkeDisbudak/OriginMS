@@ -35,9 +35,7 @@ class _Snapshot:
     leave_balances: dict[tuple[str, int], LeaveBalance] = field(
         default_factory=dict[tuple[str, int], LeaveBalance]
     )
-    public_holidays: dict[str, PublicHoliday] = field(
-        default_factory=dict[str, PublicHoliday]
-    )
+    public_holidays: dict[str, PublicHoliday] = field(default_factory=dict[str, PublicHoliday])
     leave_requests: dict[str, LeaveRequest] = field(default_factory=dict[str, LeaveRequest])
     audit_event_ids: set[str] = field(default_factory=set[str])
 
